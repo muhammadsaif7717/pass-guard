@@ -1,5 +1,5 @@
 {
-  "name": "password-manager",
+  "name": "pass-guard",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.19.1",
+    "@clerk/themes": "^2.2.42",
     "@radix-ui/react-slot": "^1.2.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
