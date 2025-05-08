@@ -9,7 +9,9 @@ import { ModeToggle } from "@/components/mode-toggle";
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/dashboard", label: "Dashboard" },
+  { href: "/cards", label: "cards" },
+  { href: "/passwords", label: "Passwords" },
+
 ];
 
 export default function Navbar() {
