@@ -7,77 +7,35 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import getPasswords from "@/lib/getPasswords";
 import { useQuery } from "@tanstack/react-query";
-
-type FetchedPasswordsData = {
-  _id: number;
-  website: string;
-  name: string;
-  username: string;
-  password: string;
-  note?: string;
-};
+import { PasswordsData } from "@/types";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { showToast } from "@/lib/toast";
+import getURL from "@/lib/getURL";
+import axios from "axios";
 
 const loadPasswordsData = async () => {
   const data = await getPasswords();
   return data;
 };
-//   {
-//     _id: 111,
-//     website: "www.facebook.com",
-//     name: "Facebook",
-//     username: "muhammadsaif7717",
-//     password: "password12345",
-//     note: "",
-//   },
-//   {
-//     _id: 222,
-//     website: "www.google.com",
-//     name: "Google",
-//     username: "muhammadsaif7717",
-//     password: "password12345",
-//     note: "",
-//   },
-//   {
-//     _id: 333,
-//     website: "www.twitter.com",
-//     name: "Twitter",
-//     username: "muhammadsaif7717",
-//     password: "password12345",
-//     note: "",
-//   },
-//   {
-//     _id: 444,
-//     website: "www.facebook.com",
-//     name: "Facebook",
-//     username: "muhammadsaif7717",
-//     password: "password12345",
-//     note: "",
-//   },
-//   {
-//     _id: 555,
-//     website: "www.google.com",
-//     name: "Google",
-//     username: "muhammadsaif7717",
-//     password: "password12345",
-//     note: "",
-//   },
-//   {
-//     _id: 666,
-//     website: "www.twitter.com",
-//     name: "Twitter",
-//     username: "muhammadsaif7717",
-//     password: "password12345",
-//     note: "",
-//   },
-// ];
 
 export default function PasswordPageClient({ name }: { name: string }) {
-  const [visible, setVisible] = useState<Record<number, boolean>>({});
+  const [visible, setVisible] = useState<Record<string, boolean>>({});
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editableData, setEditableData] = useState<PasswordsData | null>(null);
 
-  const { data, isLoading } = useQuery<FetchedPasswordsData[]>({
+  const { data, isLoading, refetch } = useQuery<PasswordsData[]>({
     queryKey: ["passwords"],
     queryFn: loadPasswordsData,
   });
+
   const fetchedPasswordsData = data ?? [];
 
   if (isLoading) {
@@ -94,17 +52,59 @@ export default function PasswordPageClient({ name }: { name: string }) {
 
   const copyToClipboard = (password: string) => {
     navigator.clipboard.writeText(password);
-    alert("Password copied!");
+    showToast({
+      title: "✅ Copied to clipboard",
+      description: "Password has been copied successfully.",
+    });
   };
 
-  const facebookPasswords = fetchedPasswordsData.filter(
+  const filteredPassData = fetchedPasswordsData.filter(
     (item) => item.name.toLowerCase() === name.toLowerCase()
   );
 
-  if (facebookPasswords.length === 0) {
+  const handleEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editableData) return;
+
+    const EditedData = {
+      username: editableData.username,
+      password: editableData.password,
+      note: editableData.note,
+    };
+
+    const id= editableData._id;
+    const url= await getURL();
+    console.log(url)
+
+    try {
+      const response = await axios.put(
+        `${url}/passwords/update/${id}`,
+        EditedData
+      );
+
+      if (!response.data) {
+        throw new Error("Failed to update password");
+      }
+
+      showToast({
+        title: "✅ Password updated successfully",
+        description: "Your password has been updated.",
+      });
+
+      setIsDialogOpen(false);
+      await refetch();
+    } catch (err) {
+      showToast({
+        title: err instanceof Error ? err.message : "Error",
+        description: "Failed to update password.",
+      });
+    }
+  };
+
+  if (filteredPassData.length === 0) {
     return (
       <div className="text-center text-red-500 font-medium mt-10">
-        No Facebook password data found.
+        No password data found.
       </div>
     );
   }
@@ -114,17 +114,17 @@ export default function PasswordPageClient({ name }: { name: string }) {
       <div className="max-w-xl mx-auto p-6">
         <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-foreground">
           <Lock className="w-6 h-6" />
-          Facebook Passwords
+          <span className="capitalize">{name}</span> Passwords
         </h2>
 
-        {facebookPasswords.map((item) => (
+        {filteredPassData.map((item) => (
           <Card
             key={item._id}
             className="p-6 space-y-4 mb-6 bg-muted dark:bg-zinc-900 text-muted-foreground dark:text-zinc-300 rounded-xl"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium">Username</label>
+                <Label className="text-sm font-medium">Username</Label>
                 <Input
                   value={item.username}
                   readOnly
@@ -132,7 +132,7 @@ export default function PasswordPageClient({ name }: { name: string }) {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Site: </label>
+                <Label className="text-sm font-medium">Site </Label>
                 <a
                   href={`https://${item.website}`}
                   target="_blank"
@@ -146,7 +146,7 @@ export default function PasswordPageClient({ name }: { name: string }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
               <div>
-                <label className="text-sm font-medium">Password</label>
+                <Label className="text-sm font-medium">Password</Label>
                 <div className="relative">
                   <Input
                     type={visible[item._id] ? "text" : "password"}
@@ -175,7 +175,7 @@ export default function PasswordPageClient({ name }: { name: string }) {
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium">Note</label>
+                <Label className="text-sm font-medium">Note</Label>
                 <Input
                   placeholder={item.note || "No note available"}
                   readOnly
@@ -185,9 +185,17 @@ export default function PasswordPageClient({ name }: { name: string }) {
             </div>
 
             <div className="flex justify-between gap-4 pt-4">
-              <Button variant="outline" className="w-1/4">
+              <Button
+                variant="outline"
+                className="w-1/4"
+                onClick={() => {
+                  setEditableData(item);
+                  setIsDialogOpen(true);
+                }}
+              >
                 Edit
               </Button>
+
               <Button variant="destructive" className="w-1/4">
                 Delete
               </Button>
@@ -198,6 +206,65 @@ export default function PasswordPageClient({ name }: { name: string }) {
           </Card>
         ))}
       </div>
+
+      {/* Edit Modal */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Password</DialogTitle>
+            <DialogDescription>
+              Update your password details below.
+            </DialogDescription>
+          </DialogHeader>
+
+          {editableData && (
+            <form onSubmit={handleEdit} className="space-y-4">
+              <div>
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  value={editableData.username}
+                  onChange={(e) =>
+                    setEditableData({
+                      ...editableData,
+                      username: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  value={editableData.password}
+                  onChange={(e) =>
+                    setEditableData({
+                      ...editableData,
+                      password: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="note">Note</Label>
+                <Input
+                  id="note"
+                  value={editableData.note}
+                  onChange={(e) =>
+                    setEditableData({
+                      ...editableData,
+                      note: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <DialogFooter className="pt-4">
+                <Button type="submit">Save changes</Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

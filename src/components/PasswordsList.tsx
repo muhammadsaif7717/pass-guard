@@ -4,27 +4,34 @@ import React from "react";
 import { ChevronRight } from "lucide-react";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { useRouter } from "next/navigation";
+import getPasswords from "@/lib/getPasswords";
+import { useQuery } from "@tanstack/react-query";
+import { PasswordsData } from "@/types";
 
-type FetchedPasswordsData = {
-  _id: number;
-  website: string;
-  name: string;
-  username: string;
-  password: string;
-  note?: string;
+
+
+const loadPasswordsData = async () => {
+  const data = await getPasswords();
+  return data;
 };
 
-const fetchedPasswordsData: FetchedPasswordsData[] = [
-  { _id: 111, website: "www.facebook.com", name: "Facebook", username: "muhammadsaif7717", password: "password12345", note: "" },
-  { _id: 222, website: "www.google.com", name: "Google", username: "muhammadsaif7717", password: "password12345", note: "" },
-  { _id: 333, website: "www.twitter.com", name: "Twitter", username: "muhammadsaif7717", password: "password12345", note: "" },
-  { _id: 444, website: "www.facebook.com", name: "Facebook", username: "muhammadsaif7717", password: "password12345", note: "" },
-  { _id: 555, website: "www.google.com", name: "Google", username: "muhammadsaif7717", password: "password12345", note: "" },
-  { _id: 666, website: "www.twitter.com", name: "Twitter", username: "muhammadsaif7717", password: "password12345", note: "" },
-];
 
 const PasswordsList = () => {
   const router = useRouter();
+
+  const { data, isLoading } = useQuery<PasswordsData[]>({
+    queryKey: ["passwords"],
+    queryFn: loadPasswordsData,
+  });
+  const fetchedPasswordsData = data ?? [];
+
+  if (isLoading) {
+    return (
+      <div className="text-center text-blue-500 font-medium mt-10">
+        Loading...
+      </div>
+    );
+  }
 
   const handleClick = (name: string) => {
     router.push(`/passwords/${name.toLowerCase()}`);
