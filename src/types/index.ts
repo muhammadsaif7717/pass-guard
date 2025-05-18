@@ -1,5 +1,5 @@
 export type PasswordsData = {
-  _id: number;
+  _id: string;
   website: string;
   name: string;
   username: string;

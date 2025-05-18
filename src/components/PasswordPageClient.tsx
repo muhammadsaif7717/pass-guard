@@ -31,6 +31,9 @@ export default function PasswordPageClient({ name }: { name: string }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editableData, setEditableData] = useState<PasswordsData | null>(null);
 
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
   const { data, isLoading, refetch } = useQuery<PasswordsData[]>({
     queryKey: ["passwords"],
     queryFn: loadPasswordsData,
@@ -46,7 +49,7 @@ export default function PasswordPageClient({ name }: { name: string }) {
     );
   }
 
-  const toggleVisibility = (id: number) => {
+  const toggleVisibility = (id: string) => {
     setVisible((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
@@ -97,6 +100,33 @@ export default function PasswordPageClient({ name }: { name: string }) {
       showToast({
         title: err instanceof Error ? err.message : "Error",
         description: "Failed to update password.",
+      });
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteId) return;
+    const url = await getURL();
+    try {
+      const response = await axios.delete(
+        `${url}/passwords/delete/${deleteId}`
+      );
+      if (!response.data) {
+        throw new Error("Failed to delete password");
+      }
+
+      showToast({
+        title: "✅ Password deleted successfully",
+        description: "Your password has been deleted.",
+      });
+
+      setIsDeleteDialogOpen(false);
+      setDeleteId(null);
+      await refetch();
+    } catch (err) {
+      showToast({
+        title: err instanceof Error ? err.message : "Error",
+        description: "Failed to delete password.",
       });
     }
   };
@@ -196,7 +226,14 @@ export default function PasswordPageClient({ name }: { name: string }) {
                 Edit
               </Button>
 
-              <Button variant="destructive" className="w-1/4">
+              <Button
+                onClick={() => {
+                  setDeleteId(item._id);
+                  setIsDeleteDialogOpen(true);
+                }}
+                variant="destructive"
+                className="w-1/4"
+              >
                 Delete
               </Button>
               <Button variant="secondary" className="w-1/4">
@@ -263,6 +300,31 @@ export default function PasswordPageClient({ name }: { name: string }) {
               </DialogFooter>
             </form>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this password? This action cannot
+              be undone.
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="space-x-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteConfirm}>
+              Delete
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </section>
