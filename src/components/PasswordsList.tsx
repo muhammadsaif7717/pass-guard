@@ -8,13 +8,10 @@ import getPasswords from "@/lib/getPasswords";
 import { useQuery } from "@tanstack/react-query";
 import { PasswordsData } from "@/types";
 
-
-
 const loadPasswordsData = async () => {
   const data = await getPasswords();
   return data;
 };
-
 
 const PasswordsList = () => {
   const router = useRouter();
@@ -27,7 +24,7 @@ const PasswordsList = () => {
 
   if (isLoading) {
     return (
-      <div className="text-center text-blue-500 font-medium mt-10">
+      <div className="mt-10 text-center font-medium text-blue-500">
         Loading...
       </div>
     );
@@ -39,12 +36,14 @@ const PasswordsList = () => {
 
   // Remove duplicates by name
   const uniquePasswords = Array.from(
-    new Map(fetchedPasswordsData.map((item) => [item.name.toLowerCase(), item])).values()
+    new Map(
+      fetchedPasswordsData.map((item) => [item.name.toLowerCase(), item])
+    ).values()
   );
 
   return (
-    <div className="max-w-2xl mx-auto p-4 md:p-5 lg:p-6 bg-white dark:border-[2px] dark:bg-zinc-900 shadow-lg rounded-2xl">
-      <h2 className="text-2xl font-semibold mb-4 text-center text-gray-800 dark:text-gray-100">
+    <div className="mx-auto max-w-2xl rounded-2xl bg-white p-4 shadow-lg md:p-5 lg:p-6 dark:border-[2px] dark:bg-zinc-900">
+      <h2 className="mb-4 text-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
         Saved Passwords
       </h2>
       <Table>
@@ -53,9 +52,9 @@ const PasswordsList = () => {
             <TableRow
               onClick={() => handleClick(item.name)}
               key={item._id}
-              className="hover:bg-gray-100 dark:hover:bg-gray-800 transition cursor-pointer"
+              className="cursor-pointer transition hover:bg-gray-100 dark:hover:bg-gray-800"
             >
-              <TableCell className="font-semibold text-gray-800 dark:text-gray-200 capitalize">
+              <TableCell className="font-semibold text-gray-800 capitalize dark:text-gray-200">
                 {item.name}
               </TableCell>
               <TableCell className="text-gray-800 dark:text-gray-200">

@@ -19,7 +19,7 @@ export const connectDB = async () => {
   }
 
   try {
-     client = new MongoClient(uri, {
+    client = new MongoClient(uri, {
       serverApi: {
         version: ServerApiVersion.v1,
         strict: true,

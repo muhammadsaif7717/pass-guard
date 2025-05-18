@@ -11,15 +11,14 @@ const navLinks = [
   { href: "/", label: "Home" },
   { href: "/cards", label: "cards" },
   { href: "/passwords", label: "Passwords" },
-
 ];
 
 export default function Navbar() {
   const pathname = usePathname();
 
   return (
-    <header className="w-full border-b border-border bg-background">
-      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+    <header className="border-border bg-background w-full border-b">
+      <div className="container mx-auto flex items-center justify-between px-4 py-3">
         {/* Logo */}
         <Link href="/" className="text-lg font-semibold">
           🔐 PassGuard
@@ -28,14 +27,16 @@ export default function Navbar() {
         {/* Nav + Controls */}
         <div className="flex items-center gap-4">
           {/* Navigation */}
-          <nav className="hidden sm:flex gap-4">
+          <nav className="hidden gap-4 sm:flex">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
-                  pathname === link.href ? "text-primary" : "text-muted-foreground"
+                  "hover:text-primary text-sm font-medium transition-colors",
+                  pathname === link.href
+                    ? "text-primary"
+                    : "text-muted-foreground"
                 )}
               >
                 {link.label}

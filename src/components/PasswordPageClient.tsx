@@ -40,7 +40,7 @@ export default function PasswordPageClient({ name }: { name: string }) {
 
   if (isLoading) {
     return (
-      <div className="text-center text-blue-500 font-medium mt-10">
+      <div className="mt-10 text-center font-medium text-blue-500">
         Loading...
       </div>
     );
@@ -72,9 +72,9 @@ export default function PasswordPageClient({ name }: { name: string }) {
       note: editableData.note,
     };
 
-    const id= editableData._id;
-    const url= await getURL();
-    console.log(url)
+    const id = editableData._id;
+    const url = await getURL();
+    console.log(url);
 
     try {
       const response = await axios.put(
@@ -103,7 +103,7 @@ export default function PasswordPageClient({ name }: { name: string }) {
 
   if (filteredPassData.length === 0) {
     return (
-      <div className="text-center text-red-500 font-medium mt-10">
+      <div className="mt-10 text-center font-medium text-red-500">
         No password data found.
       </div>
     );
@@ -111,18 +111,18 @@ export default function PasswordPageClient({ name }: { name: string }) {
 
   return (
     <section>
-      <div className="max-w-xl mx-auto p-6">
-        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-foreground">
-          <Lock className="w-6 h-6" />
+      <div className="mx-auto max-w-xl p-6">
+        <h2 className="text-foreground mb-6 flex items-center gap-2 text-2xl font-bold">
+          <Lock className="h-6 w-6" />
           <span className="capitalize">{name}</span> Passwords
         </h2>
 
         {filteredPassData.map((item) => (
           <Card
             key={item._id}
-            className="p-6 space-y-4 mb-6 bg-muted dark:bg-zinc-900 text-muted-foreground dark:text-zinc-300 rounded-xl"
+            className="bg-muted text-muted-foreground mb-6 space-y-4 rounded-xl p-6 dark:bg-zinc-900 dark:text-zinc-300"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <Label className="text-sm font-medium">Username</Label>
                 <Input
@@ -144,7 +144,7 @@ export default function PasswordPageClient({ name }: { name: string }) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 items-center gap-4 md:grid-cols-2">
               <div>
                 <Label className="text-sm font-medium">Password</Label>
                 <div className="relative">
@@ -152,12 +152,12 @@ export default function PasswordPageClient({ name }: { name: string }) {
                     type={visible[item._id] ? "text" : "password"}
                     value={item.password}
                     readOnly
-                    className="pr-20 bg-background text-foreground"
+                    className="bg-background text-foreground pr-20"
                   />
                   <button
                     type="button"
                     onClick={() => toggleVisibility(item._id)}
-                    className="absolute right-10 top-2.5 text-muted-foreground"
+                    className="text-muted-foreground absolute top-2.5 right-10"
                   >
                     {visible[item._id] ? (
                       <EyeOff size={18} />
@@ -168,7 +168,7 @@ export default function PasswordPageClient({ name }: { name: string }) {
                   <button
                     type="button"
                     onClick={() => copyToClipboard(item.password)}
-                    className="absolute right-2 top-2.5 text-muted-foreground"
+                    className="text-muted-foreground absolute top-2.5 right-2"
                   >
                     <Copy size={18} />
                   </button>
