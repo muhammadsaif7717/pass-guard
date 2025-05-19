@@ -8,9 +8,9 @@ import { cn } from "@/lib/utils";
 import { ModeToggle } from "@/components/mode-toggle";
 
 const navLinks = [
-  { href: "/", label: "Home" },
   { href: "/cards", label: "cards" },
   { href: "/passwords", label: "Passwords" },
+  { href: "/post", label: "post" },
 ];
 
 export default function Navbar() {

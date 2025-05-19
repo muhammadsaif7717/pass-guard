@@ -179,17 +179,17 @@ export default function PasswordPageClient({ name }: { name: string }) {
                 <Label className="text-sm font-medium">Password</Label>
                 <div className="relative">
                   <Input
-                    type={visible[item._id] ? "text" : "password"}
+                    type={visible[item._id as string] ? "text" : "password"}
                     value={item.password}
                     readOnly
                     className="bg-background text-foreground pr-20"
                   />
                   <button
                     type="button"
-                    onClick={() => toggleVisibility(item._id)}
+                    onClick={() => toggleVisibility(item._id as string)}
                     className="text-muted-foreground absolute top-2.5 right-10"
                   >
-                    {visible[item._id] ? (
+                    {visible[item._id as string] ? (
                       <EyeOff size={18} />
                     ) : (
                       <Eye size={18} />
@@ -228,7 +228,7 @@ export default function PasswordPageClient({ name }: { name: string }) {
 
               <Button
                 onClick={() => {
-                  setDeleteId(item._id);
+                  setDeleteId(item._id as string);
                   setIsDeleteDialogOpen(true);
                 }}
                 variant="destructive"
