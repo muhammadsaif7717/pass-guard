@@ -4,23 +4,23 @@ import React from "react";
 import { ChevronRight } from "lucide-react";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { useRouter } from "next/navigation";
-import getPasswords from "@/lib/getPasswords";
 import { useQuery } from "@tanstack/react-query";
-import { PasswordsData } from "@/types";
+import getCards from "@/lib/getCards";
+import { CardsData } from "@/types";
 
-const loadPasswordsData = async () => {
-  const data = await getPasswords();
+const loadCardsData = async () => {
+  const data = await getCards();
   return data;
 };
 
-const PasswordsList = () => {
+const CardsList = () => {
   const router = useRouter();
 
-  const { data = [], isLoading } = useQuery<PasswordsData[]>({
-    queryKey: ["passwords"],
-    queryFn: loadPasswordsData,
+  const { data = [], isLoading } = useQuery<CardsData[]>({
+    queryKey: ["cards"],
+    queryFn: loadCardsData,
   });
-  const fetchedPasswordsData = data ?? [];
+  const fetchedCardsData = data ?? [];
 
   if (isLoading) {
     return (
@@ -31,20 +31,20 @@ const PasswordsList = () => {
   }
 
   const handleClick = (name: string) => {
-    router.push(`/passwords/${name.toLowerCase()}`);
+    router.push(`/cards/${name.toLowerCase()}`);
   };
 
   // Remove duplicates by name
   const uniquePasswords = Array.from(
     new Map(
-      fetchedPasswordsData?.map((item) => [item.name.toLowerCase(), item])
+      fetchedCardsData?.map((item) => [item.name.toLowerCase(), item])
     ).values()
   );
 
   return (
     <div className="mx-auto max-w-2xl rounded-2xl bg-white p-4 shadow-lg md:p-5 lg:p-6 dark:border-[2px] dark:bg-zinc-900">
       <h2 className="mb-4 text-center text-2xl font-semibold text-gray-800 dark:text-gray-100">
-        Saved Passwords
+        Saved Cards
       </h2>
       <Table>
         <TableBody>
@@ -58,7 +58,7 @@ const PasswordsList = () => {
                 {item.name}
               </TableCell>
               <TableCell className="text-gray-800 dark:text-gray-200">
-                {item.website}
+                {item.cardNumber}
               </TableCell>
               <TableCell className="text-right">
                 <ChevronRight className="text-gray-500 dark:text-gray-300" />
@@ -71,4 +71,4 @@ const PasswordsList = () => {
   );
 };
 
-export default PasswordsList;
+export default CardsList;

@@ -30,7 +30,7 @@ export const GET = async () => {
 
     // Fetch all password records belonging to this user
     const userPasswords = await db
-      .collection("passwords")
+      .collection("cards")
       .find({ "user.email": email, "user.username": username })
       .toArray();
 
