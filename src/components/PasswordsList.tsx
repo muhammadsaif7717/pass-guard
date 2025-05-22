@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import getPasswords from "@/lib/getPasswords";
 import { useQuery } from "@tanstack/react-query";
 import { PasswordsData } from "@/types";
+import { useCLG } from "@/lib/useCLG";
 
 const loadPasswordsData = async () => {
   const data = await getPasswords();
@@ -21,6 +22,7 @@ const PasswordsList = () => {
     queryFn: loadPasswordsData,
   });
   const fetchedPasswordsData = data ?? [];
+  useCLG("fetchedPasswordsData", fetchedPasswordsData);
 
   if (isLoading) {
     return (
